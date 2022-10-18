@@ -15,7 +15,7 @@ const options = {
 
     // Optional depending on the providers
     //   fetch: customFetchImplementation,
-    apiKey: 'AIzaSyB3iXKLXN0fxMbOBR7BOpHo-PmJAI-oPVg', // for Mapquest, OpenCage, Google Premier
+    apiKey: process.env.API_KEY, // for Mapquest, OpenCage, Google Premier
     formatter: null // 'gpx', 'string', ...
 };
 const geocoder = NodeGeocoder(options);
