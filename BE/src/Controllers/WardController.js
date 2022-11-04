@@ -17,7 +17,7 @@ module.exports = {
   },
   getAllWardByIdDist: async (req, res) => {
     try {
-      const idDist = req.body;
+      const idDist = req.query;
       const result = await getAllWardByIdDist(idDist);
       return res.status(200).json(result);
     } catch (err) {

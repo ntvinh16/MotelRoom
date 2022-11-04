@@ -84,11 +84,41 @@ exports.scraping = async () => {
     return SuccessHander(200, "Create category success", result);
 }
 
+exports.getAllRoom = async () => {
+    try {
+
+        let listRoom = await Address_DetailModel.find()
+        // console.log(listRoom)
+        var listRoomDetail = [];
+        for (var room of listRoom) {
+            // console.log(room)
+            const response = await RoomModel.find({ address: room._id });
+            const result = response.map((item) => {
+                return {
+                    "_id": item._id,
+                    "nameRoom": item.nameRoom,
+                    "address": room.nameAddress,
+                    "price": item.price,
+                    "area": item.area,
+                    "phone": item.phone,
+                    "description": item.description
+                }
+            })
+            listRoomDetail.push(result);
+        }
+        return SuccessHander(200, "Create category success", listRoomDetail);
+    }
+    catch (err) {
+        console.log(err)
+        return ErrorHander(400, "Error", err);
+    }
+}
+
 exports.getAllRoomByIdCities = async (idCity) => {
     try {
 
-        let listRoom = await Address_DetailModel.find(idCity)
-        // console.log(listRoom)
+        let listRoom = await Address_DetailModel.find({idCity})
+        console.log(listRoom)
         var listRoomDetail = [];
         for (var room of listRoom) {
             // console.log(room)
@@ -215,7 +245,7 @@ exports.getRoomByPrice = async (minPrice, maxPrice) => {
         for (var item of listRoom) {
             if (item.price <= maxPrice && item.price >= minPrice) {
                 let address = await Address_DetailModel.find({ _id: item.address })
-                let result = {
+                let result = [{
                     "_id": item._id,
                     "nameRoom": item.nameRoom,
                     "address": address[0].nameAddress,
@@ -223,7 +253,7 @@ exports.getRoomByPrice = async (minPrice, maxPrice) => {
                     "area": item.area,
                     "phone": item.phone,
                     "description": item.description
-                }
+                }]
                 listRoomDetail.push(result);
             }
         }
@@ -244,7 +274,7 @@ exports.getRoomByArea = async (minArea, maxArea) => {
         for (var item of listRoom) {
             if (item.area <= maxArea && item.area >= minArea) {
                 let address = await Address_DetailModel.find({ _id: item.address })
-                let result = {
+                let result = [{
                     "_id": item._id,
                     "nameRoom": item.nameRoom,
                     "address": address[0].nameAddress,
@@ -252,11 +282,139 @@ exports.getRoomByArea = async (minArea, maxArea) => {
                     "area": item.area,
                     "phone": item.phone,
                     "description": item.description
-                }
+                }]
                 listRoomDetail.push(result);
             }
         }
         return SuccessHander(200, "Create category success", listRoomDetail);
+    }
+
+    catch (err) {
+        console.log(err)
+        return ErrorHander(400, "Error", err);
+    }
+}
+
+exports.getRoomByAreaAndPrice = async (minArea, maxArea, minPrice, maxPrice) => {
+    try {
+        let listRoom = await RoomModel.find()
+        var listRoomDetail = [];
+        for (var item of listRoom) {
+            if ((item.area <= maxArea && item.area >= minArea) && (item.price <= maxPrice && item.price >= minPrice)) {
+                let address = await Address_DetailModel.find({ _id: item.address })
+                let result = [{
+                    "_id": item._id,
+                    "nameRoom": item.nameRoom,
+                    "address": address[0].nameAddress,
+                    "price": item.price,
+                    "area": item.area,
+                    "phone": item.phone,
+                    "description": item.description
+                }]
+                listRoomDetail.push(result);
+            }
+        }
+        return SuccessHander(200, "Create category success", listRoomDetail);
+    }
+
+    catch (err) {
+        console.log(err)
+        return ErrorHander(400, "Error", err);
+    }
+}
+
+exports.getRoomBySearch = async (idCity, nameDist, nameWard) => {
+    try {
+        var listRoomDetail = [];
+        if (idCity === '') {
+            let listAddressRoom = await Address_DetailModel.find();
+            for (var room of listAddressRoom) {
+                const response = await RoomModel.find({ address: room._id });
+                const result = response.map((item) => {
+                    return {
+                        "_id": item._id,
+                        "nameRoom": item.nameRoom,
+                        "address": room.nameAddress,
+                        "price": item.price,
+                        "area": item.area,
+                        "phone": item.phone,
+                        "description": item.description
+                    }
+                })
+                listRoomDetail.push(result);
+            }
+            return SuccessHander(200, "Create category success", listRoomDetail);
+        } else if (idCity != '' && nameDist === '' && nameWard === '') {
+            let listAddressRoom = await Address_DetailModel.find({ idCity: idCity });
+            for (var room of listAddressRoom) {
+                const response = await RoomModel.find({ address: room._id });
+                const result = response.map((item) => {
+                    return {
+                        "_id": item._id,
+                        "nameRoom": item.nameRoom,
+                        "address": room.nameAddress,
+                        "price": item.price,
+                        "area": item.area,
+                        "phone": item.phone,
+                        "description": item.description
+                    }
+                })
+                listRoomDetail.push(result);
+            }
+            return SuccessHander(200, "Create category success", listRoomDetail);
+        } else if (idCity != '' && nameDist != '' && nameWard === '') {
+            let listAddressRoom = await Address_DetailModel.find({ idCity: idCity });
+            let listAddressRoomDist = []
+            listAddressRoom.forEach((item) => {
+                let addressDist = item.nameAddress.split(",")[2].trim();
+                if (addressDist == nameDist)
+                    listAddressRoomDist.push(item);
+            })
+            for (var room of listAddressRoomDist) {
+                // console.log(room)
+                const response = await RoomModel.find({ address: room._id });
+                const result = response.map((item) => {
+                    return {
+                        "_id": item._id,
+                        "nameRoom": item.nameRoom,
+                        "address": room.nameAddress,
+                        "price": item.price,
+                        "area": item.area,
+                        "phone": item.phone,
+                        "description": item.description
+                    }
+                })
+                listRoomDetail.push(result);
+            }
+            return SuccessHander(200, "Create category success", listRoomDetail);
+        } else if (idCity != '' && nameDist != '' && nameWard != '') {
+            let listAddressRoom = await Address_DetailModel.find({ idCity: idCity });
+            let listAddressRoomDist = []
+            listAddressRoom.forEach((item) => {
+                let addressDist = item.nameAddress.split(",")[2].trim();
+                let addressWard = item.nameAddress.split(",")[1].trim();
+
+                if (addressDist == nameDist && addressWard == nameWard)
+                    listAddressRoomDist.push(item);
+            })
+            for (var room of listAddressRoomDist) {
+                const response = await RoomModel.find({ address: room._id });
+                const result = response.map((item) => {
+                    return {
+                        "_id": item._id,
+                        "nameRoom": item.nameRoom,
+                        "address": room.nameAddress,
+                        "price": item.price,
+                        "area": item.area,
+                        "phone": item.phone,
+                        "description": item.description
+                    }
+                })
+                listRoomDetail.push(result);
+            }
+            return SuccessHander(200, "Create category success", listRoomDetail);
+        }
+        return SuccessHander(200, "Create category success");
     }
 
     catch (err) {

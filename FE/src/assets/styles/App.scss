@@ -2,6 +2,151 @@
 
 * {
   margin: 0;
-  padding: 0; 
+  padding: 0;
   box-sizing: border-box;
 }
+
+// Home page
+.room-detail {
+  width: 100%;
+}
+
+/* DropdownDemo.css */
+
+.dropdown-demo .p-dropdown {
+  width: 14rem;
+}
+
+.dropdown-demo .country-item-value img.flag {
+  width: 17px;
+}
+
+.p-dropdown {
+  position: relative !important;
+}
+
+.p-dropdown-items-wrapper {
+  position: absolute;
+  top: 0 !important;
+  width: 100%;
+  border: 1px solid #ccc;
+  left: 0px;
+  background-color: #ffffff;
+}
+
+.p-card-body {
+  background-color: #ffffff;
+  width: 100%;
+}
+
+.p-card-body:hover {
+  cursor: pointer;
+  background-color: $grey100;
+}
+
+
+.p-card-title {
+  color: #333;
+  font-weight: 500 !important;
+}
+
+.p-card-content {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px !important;
+  width: 100%;
+}
+
+.text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  /* number of lines to show */
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.slider-demo .p-slider-horizontal,
+.slider-demo .p-inputtext {
+  width: 14rem;
+}
+
+.p-slider {
+  width: 100% !important;
+}
+
+.slider-demo .p-slider-vertical {
+  height: 14rem;
+}
+
+.list-price-value-li:hover {
+  cursor: pointer;
+  color: red;
+}
+
+.list-area-value-li:hover {
+  cursor: pointer;
+  color: red;
+}
+
+.RoomTitle {
+  border-bottom: 1px solid;
+  color: #1976d2;
+}
+
+.css-19r6kue-MuiContainer-root {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+@media only screen and (max-width: 850px) {
+  .card-city {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .p-card {
+    margin-right: 0 !important;
+    margin-bottom: 30px;
+  }
+
+  .slect-area {
+    margin-bottom: 6px;
+  }
+
+  .text-title {
+    font-size: 0.9rem !important;
+  }
+
+  .cart-info-detail {
+    flex-direction: column;
+    margin: 8px;
+  }
+
+  .search-info-detail {
+    display: none;
+  }
+
+  .search-info {
+    flex-direction: column;
+
+  }
+
+  .image-room {
+    width: 130px !important;
+    height: 120px !important;
+  }
+
+  .card-city-detail {
+    width: 22rem !important;
+  }
+
+  // RoomListPage
+  .image-silder {
+    height: 400px !important;
+  }
+
+}
+

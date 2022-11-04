@@ -1,4 +1,4 @@
-const { add, scraping, getAllRoomByIdCities, getAllRoomByIdDists, getAllRoomByIdWard, getRoomById, getRoomByPrice, getRoomByArea } = require("../Services/RoomService");
+const { add, scraping, getAllRoom, getAllRoomByIdCities, getAllRoomByIdDists, getAllRoomByIdWard, getRoomById, getRoomByPrice, getRoomByArea , getRoomByAreaAndPrice, getRoomBySearch} = require("../Services/RoomService");
 const getRoomDetail = require('../Utils/scraping')
 
 module.exports = {
@@ -28,9 +28,21 @@ module.exports = {
       });
     }
   },
+  getAllRoom: async (req, res) => {
+    try {
+      const result = await getAllRoom();
+      return res.status(200).json(result);
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({
+        message: "Internal Server Error",
+        err,
+      });
+    }
+  },
   getAllRoomByIdCities: async (req, res) => {
     try {
-      const idCity = req.body;
+      const idCity = req.query.idCity;
       const result = await getAllRoomByIdCities(idCity);
       return res.status(200).json(result);
     } catch (err) {
@@ -85,8 +97,8 @@ module.exports = {
   },
   getRoomByPrice: async (req, res) => {
     try {
-      const minPrice = req.body.minPrice;
-      const maxPrice = req.body.maxPrice;
+      const minPrice = req.query.minPrice;
+      const maxPrice = req.query.maxPrice;
       const result = await getRoomByPrice(minPrice, maxPrice);
       return res.status(200).json(result);
     } catch (err) {
@@ -99,12 +111,42 @@ module.exports = {
   },
   getRoomByArea: async (req, res) => {
     try {
-      const minArea = req.body.minArea;
-      const maxArea = req.body.maxArea;
+      const minArea = req.query.minArea;
+      const maxArea = req.query.maxArea;
       const result = await getRoomByArea(minArea, maxArea);
       return res.status(200).json(result);
     } catch (err) {
       console.log(err)
+      return res.status(500).json({
+        message: "Internal Server Error",
+        err,
+      });
+    }
+  },
+  getRoomByAreaAndPrice: async (req, res) => {
+    try {
+      const minArea = req.query.minArea;
+      const maxArea = req.query.maxArea;
+      const minPrice = req.query.minPrice;
+      const maxPrice = req.query.maxPrice;
+      const result = await getRoomByAreaAndPrice(minArea, maxArea, minPrice, maxPrice);
+      return res.status(200).json(result);
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({
+        message: "Internal Server Error",
+        err,
+      });
+    }
+  },
+  getRoomBySearch: async (req, res) => {
+    try {
+      const idCity = req.body.idCity;
+      const nameDist = req.body.nameDist;
+      const nameWard = req.body.nameWard;
+      const result = await getRoomBySearch(idCity, nameDist, nameWard);
+      return res.status(200).json(result);
+    } catch (err) {
       return res.status(500).json({
         message: "Internal Server Error",
         err,

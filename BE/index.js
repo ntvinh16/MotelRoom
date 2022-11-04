@@ -34,6 +34,7 @@ app.use('/', require('./src/Routers/RoomRouter'));
 app.use('/', require('./src/Routers/CityRouter'));
 app.use('/', require('./src/Routers/DistRouter'));
 app.use('/', require('./src/Routers/WardRouter'));
+app.use('/', require('./src/Routers/ImageRouter'));
 
 
 
