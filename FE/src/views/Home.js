@@ -4,6 +4,7 @@ import RoomService from 'services/test.service';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Slider } from 'primereact/slider';
+import Pagination from '@mui/material/Pagination';
 
 
 
@@ -241,6 +242,7 @@ const Home = () => {
                                 <h2>Danh Sách Tin Đăng</h2>
                             </div>
                             {room !== null ? room.map((item, index) => <RoomList key={index} room={item[0]} />) : <div></div>}
+                        <Pagination style={{marginTop: '10px', textAlign: 'center'}} count={10} color="primary" />
                         </div>
                     </Col>
                     <Col className='search-info-detail' lg={3}>
