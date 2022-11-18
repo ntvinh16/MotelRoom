@@ -18,6 +18,9 @@ const room = new Schema(
     phone: {
       type: String
     },
+    nameContact: {
+      type: String
+    },
     description: {
       type: String
     },

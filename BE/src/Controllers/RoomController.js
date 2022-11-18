@@ -1,11 +1,10 @@
-const { add, scraping, getAllRoom, getAllRoomByIdCities, getAllRoomByIdDists, getAllRoomByIdWard, getRoomById, getRoomByPrice, getRoomByArea , getRoomByAreaAndPrice, getRoomBySearch} = require("../Services/RoomService");
+const { add, scraping, getAllRoom, getAllRoomByIdCities, getAllRoomByIdDists, getAllRoomByIdWard, getLocationByIdRoom, getRoomPageOne, getRoomById, getRoomByPrice, getRoomByArea , getRoomByAreaAndPrice, getRoomBySearch, getRoomByPage} = require("../Services/RoomService");
 const getRoomDetail = require('../Utils/scraping')
 
 module.exports = {
   add: async (req, res) => {
     try {
       const data = await getRoomDetail()
-    
       const result = await add(data);
       return res.status(200).json(result);
     } catch (err) {
@@ -30,7 +29,8 @@ module.exports = {
   },
   getAllRoom: async (req, res) => {
     try {
-      const result = await getAllRoom();
+      const page = req.query.page;
+      const result = await getAllRoom(page);
       return res.status(200).json(result);
     } catch (err) {
       console.log(err)
@@ -84,7 +84,7 @@ module.exports = {
   },
   getRoomById: async (req, res) => {
     try {
-      const idRoom = req.body.idRoom;
+      const idRoom = req.query.idRoom;
       const result = await getRoomById(idRoom);
       return res.status(200).json(result);
     } catch (err) {
@@ -145,6 +145,41 @@ module.exports = {
       const nameDist = req.body.nameDist;
       const nameWard = req.body.nameWard;
       const result = await getRoomBySearch(idCity, nameDist, nameWard);
+      return res.status(200).json(result);
+    } catch (err) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        err,
+      });
+    }
+  },
+  getRoomByPage: async (req, res) => {
+    try {
+      const pageNumber = req.query.pageNumber;
+      const result = await getRoomByPage(pageNumber);
+      return res.status(200).json(result);
+    } catch (err) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        err,
+      });
+    }
+  },
+  getLocationByIdRoom: async (req, res) => {
+    try {
+      const idRoom = req.query.idRoom;
+      const result = await getLocationByIdRoom(idRoom);
+      return res.status(200).json(result);
+    } catch (err) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        err,
+      });
+    }
+  },
+  getRoomPageOne: async (req, res) => {
+    try {
+      const result = await getRoomPageOne();
       return res.status(200).json(result);
     } catch (err) {
       return res.status(500).json({

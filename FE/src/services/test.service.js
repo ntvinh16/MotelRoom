@@ -22,8 +22,8 @@ class RoomService extends BaseService {
         return result;
     }
 
-    getAllRoom = async () => {
-        const result = await this.api.get('/room/getAllRoom');
+    getAllRoom = async (page) => {
+        const result = await this.api.get(`/room/getAllRoom?page=${page}`);
         return result;
     }
 
@@ -60,6 +60,21 @@ class RoomService extends BaseService {
 
     getRoomByArea = async (minArea, maxArea) => {
         const result = await this.api.get(`/room/getRoomByArea?minArea=${minArea}&maxArea=${maxArea}`);
+        return result;
+    }
+
+    getRoomById = async (idRoom) => {
+        const result = await this.api.get(`/room/getRoomById?idRoom=${idRoom}`);
+        return result;
+    }
+
+    getLocationByIdRoom = async (idRoom) => {
+        const result = await this.api.get(`/room/getLocationByIdRoom?idRoom=${idRoom}`);
+        return result;
+    }
+    
+    getRoomPageOne = async () => {
+        const result = await this.api.get(`/room/getRoomPageOne`);
         return result;
     }
     

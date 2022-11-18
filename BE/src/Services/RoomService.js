@@ -56,6 +56,7 @@ exports.add = async (data) => {
                         nameRoom: item[0],
                         address: address_detail._id,
                         phone: item[2].trim(),
+                        // nameContact: item[1].trim(), Luu y kiem tra item thu may?????????
                         price: price,
                         area: area,
                         description: item[5],
@@ -84,29 +85,58 @@ exports.scraping = async () => {
     return SuccessHander(200, "Create category success", result);
 }
 
-exports.getAllRoom = async () => {
+exports.getAllRoom = async (page) => {
     try {
+        const PAGE_SIZE = 10;
+        if (page) {
+            page = parseInt(page);
+            var skip = (page - 1) * PAGE_SIZE;
+            var roomNumbers = await Address_DetailModel.count() ;
+            var maxPage = Math.ceil(roomNumbers/10)
+            let listRoom = await Address_DetailModel.find().skip(skip).limit(PAGE_SIZE);
+            var listRoomDetail = [];
+            for (var room of listRoom) {
+                const response = await RoomModel.find({ address: room._id });
+                const result = response.map((item) => {
+                    return {
+                        "_id": item._id,
+                        "nameRoom": item.nameRoom,
+                        "address": room.nameAddress,
+                        "price": item.price,
+                        "area": item.area,
+                        "phone": item.phone,
+                        "description": item.description,
+                    }
+                })
+                listRoomDetail.push(result);
+            }
+            return SuccessHander(200, "Create category success", {listRoomDetail, maxPage});
 
-        let listRoom = await Address_DetailModel.find()
-        // console.log(listRoom)
-        var listRoomDetail = [];
-        for (var room of listRoom) {
-            // console.log(room)
-            const response = await RoomModel.find({ address: room._id });
-            const result = response.map((item) => {
-                return {
-                    "_id": item._id,
-                    "nameRoom": item.nameRoom,
-                    "address": room.nameAddress,
-                    "price": item.price,
-                    "area": item.area,
-                    "phone": item.phone,
-                    "description": item.description
-                }
-            })
-            listRoomDetail.push(result);
+            // console.log(skip)
+        } else {
+
+            let listRoom = await Address_DetailModel.find()
+            // console.log(listRoom)
+            var listRoomDetail = [];
+            for (var room of listRoom) {
+                // console.log(room)
+                const response = await RoomModel.find({ address: room._id });
+                const result = response.map((item) => {
+                    return {
+                        "_id": item._id,
+                        "nameRoom": item.nameRoom,
+                        "address": room.nameAddress,
+                        "price": item.price,
+                        "area": item.area,
+                        "phone": item.phone,
+                        "description": item.description
+                    }
+                })
+                listRoomDetail.push(result);
+            }
+            return SuccessHander(200, "Create category success", listRoomDetail);
         }
-        return SuccessHander(200, "Create category success", listRoomDetail);
+
     }
     catch (err) {
         console.log(err)
@@ -117,8 +147,8 @@ exports.getAllRoom = async () => {
 exports.getAllRoomByIdCities = async (idCity) => {
     try {
 
-        let listRoom = await Address_DetailModel.find({idCity})
-        console.log(listRoom)
+        let listRoom = await Address_DetailModel.find({ idCity })
+        // console.log(listRoom)
         var listRoomDetail = [];
         for (var room of listRoom) {
             // console.log(room)
@@ -226,6 +256,7 @@ exports.getRoomById = async (idRoom) => {
                 "price": item.price,
                 "area": item.area,
                 "phone": item.phone,
+                // "nameContact": item.nameContact,
                 "description": item.description
             }
         })
@@ -301,6 +332,35 @@ exports.getRoomByAreaAndPrice = async (minArea, maxArea, minPrice, maxPrice) => 
         var listRoomDetail = [];
         for (var item of listRoom) {
             if ((item.area <= maxArea && item.area >= minArea) && (item.price <= maxPrice && item.price >= minPrice)) {
+                let address = await Address_DetailModel.find({ _id: item.address })
+                let result = [{
+                    "_id": item._id,
+                    "nameRoom": item.nameRoom,
+                    "address": address[0].nameAddress,
+                    "price": item.price,
+                    "area": item.area,
+                    "phone": item.phone,
+                    "description": item.description
+                }]
+                listRoomDetail.push(result);
+            }
+        }
+        return SuccessHander(200, "Create category success", listRoomDetail);
+    }
+
+    catch (err) {
+        console.log(err)
+        return ErrorHander(400, "Error", err);
+    }
+}
+
+exports.getRoomByPage = async (pageNumber) => {
+    try {
+        let listRoom = await RoomModel.find()
+        var listRoomDetail = [];
+
+        for (var item of listRoom) {
+            if (item.price <= maxPrice && item.price >= minPrice) {
                 let address = await Address_DetailModel.find({ _id: item.address })
                 let result = [{
                     "_id": item._id,
@@ -423,4 +483,50 @@ exports.getRoomBySearch = async (idCity, nameDist, nameWard) => {
     }
 }
 
+exports.getLocationByIdRoom = async (idRoom) => {
+    try {
+        let room = await RoomModel.find({ _id: idRoom })
+        let address = await Address_DetailModel.find({ _id: room[0].address })
+
+        let location = await CoordinatesModel.find({ _id: address[0].idCoordinaste })
+
+        // console.log(location)
+        const result = location.map((item) => {
+            return {
+                "latitude": item.latitude,
+                "longitude": item.longitude,
+            }
+        })
+        return SuccessHander(200, "Create category success", result);
+    }
+    catch (err) {
+        console.log(err)
+        return ErrorHander(400, "Error", err);
+    }
+}
+
+exports.getRoomPageOne = async (idRoom) => {
+    try {
+        let room = await RoomModel.find().limit(10);
+        let listRoom = []
+
+        for (var item of room) {
+            let image = await ImageModel.find({ idRoom: item._id })
+            let result = {
+                "_id": item._id,
+                "nameRoom": item.nameRoom,
+                "price": item.price,
+                "image": image[0].nameImage
+
+            }
+            listRoom.push(result);
+        }
+
+        return SuccessHander(200, "Create category success", listRoom);
+    }
+    catch (err) {
+        console.log(err)
+        return ErrorHander(400, "Error", err);
+    }
+}
 

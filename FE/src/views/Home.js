@@ -68,12 +68,16 @@ const Home = () => {
         }
     }
 
+    const [page, setPage] = useState(1); 
+    const [maxPage, setMaxPage] = useState(0); 
+
     const [room, setRoom] = useState(null);
 
-    const getRoom = async () => {
+    const getRoom = async (page) => {
         try {
-            const result = await roomService.getAllRoom();
-            setRoom(result.data.data);
+            const result = await roomService.getAllRoom(page);
+            setMaxPage(result.data.data.maxPage)
+            setRoom(result.data.data.listRoomDetail);
         } catch (error) {
             console.log(error);
         }
@@ -94,8 +98,7 @@ const Home = () => {
 
     useEffect(() => {
         getCity();
-        getRoom();
-        getRoomByAreaAndPrice();
+        getRoom(page);
     }, []);
 
 
@@ -158,7 +161,10 @@ const Home = () => {
 
     }
 
-
+    const handleClickPage = (e) => {
+        setPage(e.target.innerText);
+        getRoom(e.target.innerText);
+    }
 
     // Layout
 
@@ -179,10 +185,11 @@ const Home = () => {
                 <Row>
                     <Col>
                         <div border="light" style={{ textAlign: 'center', marginTop: '10px' }}>
-                            <Dropdown className='slect-area' style={{ color: '#333', marginRight: "5px", minWidth: '260px' }} value={selectedCity} options={cities} onChange={onCityChange} optionLabel="namCities" optionValue='_id' placeholder="Select a City" />
-                            <Dropdown className='slect-area' style={{ color: '#333', marginRight: "5px", minWidth: '260px' }} value={selectedDists} options={dists} onChange={onDistChange} optionLabel="nameDist" optionValue='_id' placeholder="Select a Dist" />
-                            <Dropdown className='slect-area' style={{ color: '#333', marginRight: "5px", minWidth: '260px' }} value={selectedWards} options={wards} onChange={onWardChange} optionLabel="nameWard" optionValue='_id' placeholder="Select a Ward" />
-                            <Button style={{ minWidth: '260px' }} label="Search" icon="pi pi-search" iconPos="right" onClick={onSearch} />
+                            <Dropdown className='slect-area' style={{ color: '#333', marginRight: "5px", minWidth: '260px' }} value={selectedCity} options={cities} onChange={onCityChange} optionLabel="namCities" optionValue='_id' placeholder="Thành phố" />
+                            <Dropdown className='slect-area' style={{ color: '#333', marginRight: "5px", minWidth: '260px' }} value={selectedDists} options={dists} onChange={onDistChange} optionLabel="nameDist" optionValue='_id' placeholder="Quận, huyện" />
+                            <Dropdown className='slect-area' style={{ color: '#333', marginRight: "5px", minWidth: '260px' }} value={selectedWards} options={wards} onChange={onWardChange} optionLabel="nameWard" optionValue='_id' placeholder="Phường, xã" />
+                            <Button style={{ minWidth: '260px'}} label="Tìm kiếm" icon="pi pi-search" iconPos="right" onClick={onSearch} />
+                            <Button style={{ minWidth: '260px', marginTop: '6px', backgroundColor: "#fbc02dc", border: "none" }} label="Tìm kiếm quanh đây" icon="pi pi-search" iconPos="right" onClick={onSearch} />
                         </div>
                     </Col>
                 </Row>
@@ -242,7 +249,7 @@ const Home = () => {
                                 <h2>Danh Sách Tin Đăng</h2>
                             </div>
                             {room !== null ? room.map((item, index) => <RoomList key={index} room={item[0]} />) : <div></div>}
-                        <Pagination style={{marginTop: '10px', textAlign: 'center'}} count={10} color="primary" />
+                        <Pagination onClick={handleClickPage}  style={{marginTop: '10px', textAlign: 'center'}} count={maxPage} color="primary" />
                         </div>
                     </Col>
                     <Col className='search-info-detail' lg={3}>

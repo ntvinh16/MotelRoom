@@ -21,6 +21,7 @@ async function getRoomDetail() {
                 description = $(this).find(".post-main-content .section-content p").text();
                 address = $(this).find(".post-address").text().split(":")[1];
                 phone = $(this).find(".post-contact .section-content .table tbody tr")[1].children[1].children[0].data
+                nameContact = $(this).find(".post-contact .section-content .table tbody tr")[0].children[1].children[0].data
                 image_link = $(this).find(".images-swiper-container .swiper-slide img");
                 let list_image = [];
                 if(image_link.length != 0){
@@ -29,9 +30,10 @@ async function getRoomDetail() {
                         list_image.push(image);
                     }
                 }
-                roomDetail_data.push([title, address, phone, price, area, description, list_image]);
+                roomDetail_data.push([title, address, phone, price, area, nameContact, description, list_image]);
             });
         }
+        console.log(roomDetail_data)
         return roomDetail_data
     }
     catch (err) {
@@ -67,7 +69,7 @@ async function getPage(url) {
         const $ = cheerio.load(response.data);
         let pages = [];
         pageURL = $("a[class='page-link'][rel='next']").attr('href');
-        pageNumber = pageURL.split('=')[1]
+        // pageNumber = pageURL.split('=')[1]
         for (let i = 1; i < 2; i++) {
             next_page = baseUrl + '?page=' + i;
             pages.push(next_page);
