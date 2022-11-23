@@ -7,8 +7,11 @@ const SortByPrice = (props) => {
 
     const SortByPrice = async (minPrice, maxPrice) => {
         try {
+            props.setIsSearch(true)
             const result = await roomService.getRoomByPrice(parseInt(minPrice) * 1000000, parseInt(maxPrice) * 1000000);
             props.setRoomHome(result.data.data);
+            props.setCurrentPage(1)
+            props.setMaxPage(parseInt(Math.ceil(result.data.data.length)/10)+1);
         } catch (err) {
             console.log(err);
         }

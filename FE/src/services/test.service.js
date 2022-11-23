@@ -43,8 +43,8 @@ class RoomService extends BaseService {
         return result;
     }
 
-    getRoomBySearch = async (idCity, nameDist, nameWard) => {
-        const result = await this.api.post(`/room/getRoomBySearch`, {idCity, nameDist, nameWard});
+    getRoomBySearch = async (idCity, nameDist, nameWard, page) => {
+        const result = await this.api.post(`/room/getRoomBySearch?page=${page}`, {idCity, nameDist, nameWard});
         return result;
     }
 
@@ -77,8 +77,13 @@ class RoomService extends BaseService {
         const result = await this.api.get(`/room/getRoomPageOne`);
         return result;
     }
-    
 
+    getPageHome = async () => {
+        const result = await this.api.get(`/room/getPageHome`);
+        return result;
+    }
+    
+    
     
 
 

@@ -91,8 +91,6 @@ exports.getAllRoom = async (page) => {
         if (page) {
             page = parseInt(page);
             var skip = (page - 1) * PAGE_SIZE;
-            var roomNumbers = await Address_DetailModel.count() ;
-            var maxPage = Math.ceil(roomNumbers/10)
             let listRoom = await Address_DetailModel.find().skip(skip).limit(PAGE_SIZE);
             var listRoomDetail = [];
             for (var room of listRoom) {
@@ -110,7 +108,7 @@ exports.getAllRoom = async (page) => {
                 })
                 listRoomDetail.push(result);
             }
-            return SuccessHander(200, "Create category success", {listRoomDetail, maxPage});
+            return SuccessHander(200, "Create category success", listRoomDetail);
 
             // console.log(skip)
         } else {
@@ -385,8 +383,11 @@ exports.getRoomByPage = async (pageNumber) => {
 
 exports.getRoomBySearch = async (idCity, nameDist, nameWard) => {
     try {
+        
         var listRoomDetail = [];
         if (idCity === '') {
+          
+
             let listAddressRoom = await Address_DetailModel.find();
             for (var room of listAddressRoom) {
                 const response = await RoomModel.find({ address: room._id });
@@ -405,6 +406,7 @@ exports.getRoomBySearch = async (idCity, nameDist, nameWard) => {
             }
             return SuccessHander(200, "Create category success", listRoomDetail);
         } else if (idCity != '' && nameDist === '' && nameWard === '') {
+
             let listAddressRoom = await Address_DetailModel.find({ idCity: idCity });
             for (var room of listAddressRoom) {
                 const response = await RoomModel.find({ address: room._id });
@@ -474,7 +476,7 @@ exports.getRoomBySearch = async (idCity, nameDist, nameWard) => {
             }
             return SuccessHander(200, "Create category success", listRoomDetail);
         }
-        return SuccessHander(200, "Create category success");
+        return SuccessHander(200, "Create category success", listRoomDetail);
     }
 
     catch (err) {
@@ -523,6 +525,19 @@ exports.getRoomPageOne = async (idRoom) => {
         }
 
         return SuccessHander(200, "Create category success", listRoom);
+    }
+    catch (err) {
+        console.log(err)
+        return ErrorHander(400, "Error", err);
+    }
+}
+
+exports.getPageHome = async () => {
+    try {
+        let pageNumber = await RoomModel.count();
+        const maxPage = Math.ceil(pageNumber / 10)
+
+        return SuccessHander(200, "Create category success", maxPage);
     }
     catch (err) {
         console.log(err)

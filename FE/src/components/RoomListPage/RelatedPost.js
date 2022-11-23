@@ -17,9 +17,9 @@ const RelatedPost = (props) => {
                 <h3 style={{ margin: "20px 0 10px 0" }}>Tin mới đăng</h3>
                 {
                     props.roomNew ? props.roomNew.map((item, index) => {
-                        console.log(item)
-                            return <Link style={{ textDecoration: "none" }} to={`/roomdetail/${item._id}`}>
-                            <div key={index} style={{ display: 'flex', margin: "20px 0 10px 0" }} onClick={() => props.changeParam(item._id)}>
+                        
+                            return <Link key={index} style={{ textDecoration: "none" }} to={`/roomdetail/${item._id}`}>
+                            <div  style={{ display: 'flex', margin: "20px 0 10px 0" }} onClick={() => props.changeParam(item._id)}>
                                 <img style={{ width: '70px', height: '70px', position: 'relative', marginLeft: '14px' }} src={item.image} />
                                 <div style={{ width: "190px", marginLeft: "10px" }}>
                                     <h2 className='text' style={{ fontSize: '1rem', color: '#E13427' }}>{item.nameRoom}</h2>

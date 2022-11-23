@@ -1,4 +1,4 @@
-const { add, scraping, getAllRoom, getAllRoomByIdCities, getAllRoomByIdDists, getAllRoomByIdWard, getLocationByIdRoom, getRoomPageOne, getRoomById, getRoomByPrice, getRoomByArea , getRoomByAreaAndPrice, getRoomBySearch, getRoomByPage} = require("../Services/RoomService");
+const { add, scraping, getAllRoom, getPageHome, getAllRoomByIdCities, getAllRoomByIdDists, getAllRoomByIdWard, getLocationByIdRoom, getRoomPageOne, getRoomById, getRoomByPrice, getRoomByArea , getRoomByAreaAndPrice, getRoomBySearch, getRoomByPage} = require("../Services/RoomService");
 const getRoomDetail = require('../Utils/scraping')
 
 module.exports = {
@@ -144,7 +144,8 @@ module.exports = {
       const idCity = req.body.idCity;
       const nameDist = req.body.nameDist;
       const nameWard = req.body.nameWard;
-      const result = await getRoomBySearch(idCity, nameDist, nameWard);
+      const page = req.query.page;
+      const result = await getRoomBySearch(idCity, nameDist, nameWard, page);
       return res.status(200).json(result);
     } catch (err) {
       return res.status(500).json({
@@ -180,6 +181,17 @@ module.exports = {
   getRoomPageOne: async (req, res) => {
     try {
       const result = await getRoomPageOne();
+      return res.status(200).json(result);
+    } catch (err) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        err,
+      });
+    }
+  },
+  getPageHome: async (req, res) => {
+    try {
+      const result = await getPageHome();
       return res.status(200).json(result);
     } catch (err) {
       return res.status(500).json({

@@ -1,7 +1,7 @@
 const express = require("express");
 const route = express.Router();
 
-const { scraping, add, getAllRoom,  getAllRoomByIdCities, getAllRoomByIdDists, getAllRoomByIdWard, getRoomById, getRoomPageOne, getRoomByPrice, getLocationByIdRoom, getRoomByArea, getRoomByAreaAndPrice, getRoomBySearch, getRoomByPage } = require("../Controllers/RoomController");
+const { scraping, add, getAllRoom, getPageHome,  getAllRoomByIdCities, getAllRoomByIdDists, getAllRoomByIdWard, getRoomById, getRoomPageOne, getRoomByPrice, getLocationByIdRoom, getRoomByArea, getRoomByAreaAndPrice, getRoomBySearch, getRoomByPage } = require("../Controllers/RoomController");
 
 route.get('/api/room/scraping', scraping)
 route.post('/api/room/add', add)
@@ -17,6 +17,7 @@ route.post('/api/room/getRoomBySearch', getRoomBySearch)
 route.post('/api/room/getRoomByPage', getRoomByPage)
 route.get('/api/room/getLocationByIdRoom', getLocationByIdRoom)
 route.get('/api/room/getRoomPageOne', getRoomPageOne)
+route.get('/api/room/getPageHome', getPageHome)
 
 
 

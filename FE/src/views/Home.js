@@ -26,11 +26,14 @@ import Image_HN from 'assets/images/location_hn.jpg';
 
 
 
+
+
 const roomService = new RoomService();
 const Home = () => {
     const [selectedCity, setSelectedCity] = useState('');
     const [selectedDists, setSelectedDists] = useState('');
     const [selectedWards, setSelectedWards] = useState('');
+    const [isSreach, setIsSearch] = useState(false);
 
     const [cities, setCities] = useState(null);
     const [dists, setDists] = useState(null);
@@ -38,6 +41,7 @@ const Home = () => {
     const [price, setPrice] = useState([0, 50]);
     const [area, setArea] = useState([0, 100]);
 
+    const [currentPage, setCurrentPage] = useState(1)
 
 
 
@@ -71,27 +75,40 @@ const Home = () => {
     const [page, setPage] = useState(1); 
     const [maxPage, setMaxPage] = useState(0); 
 
-    const [room, setRoom] = useState(null);
+    const [room, setRoom] = useState([]);
 
     const getRoom = async (page) => {
         try {
             const result = await roomService.getAllRoom(page);
-            setMaxPage(result.data.data.maxPage)
-            setRoom(result.data.data.listRoomDetail);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-
-    const getRoomByAreaAndPrice = async () => {
-        try {
-            const result = await roomService.getRoomByAreaAndPrice(area[0], area[1], price[0] * 1000000, price[1] * 1000000);
+            // setMaxPage(result.data.data.maxPage)
             setRoom(result.data.data);
         } catch (error) {
             console.log(error);
         }
     }
+
+    const getPageHome = async () => {
+        try {
+            const result = await roomService.getPageHome();
+            setMaxPage(result.data.data)
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const getRoomByAreaAndPrice = async () => {
+        try {
+            setIsSearch(true);
+            const result = await roomService.getRoomByAreaAndPrice(area[0], area[1], price[0] * 1000000, price[1] * 1000000);
+            setRoom(result.data.data);
+            setCurrentPage(1)
+            setMaxPage(parseInt(Math.ceil(result.data.data.length)/10)+1);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
 
 
 
@@ -99,6 +116,7 @@ const Home = () => {
     useEffect(() => {
         getCity();
         getRoom(page);
+        getPageHome()
     }, []);
 
 
@@ -110,6 +128,7 @@ const Home = () => {
 
     const onSearch = async (e) => {
         try {
+            setIsSearch(true);
             let idCity = selectedCity
             let dist = ''
             let ward = ''
@@ -127,7 +146,8 @@ const Home = () => {
             }
             const result = await roomService.getRoomBySearch(idCity, dist, ward);
             setRoom(result.data.data);
-            
+            setMaxPage(parseInt(Math.ceil(result.data.data.length)/10)+1);
+            setCurrentPage(1)
 
         } catch (e) {
             console.log(e)
@@ -137,9 +157,13 @@ const Home = () => {
 
     const onClickCity = async (e) => {
         try {
+            setIsSearch(true);
             const result = await roomService.getAllRoomByIdCities(e); 
-            // console.log(result.data);
+            console.log(result.data.data);
             setRoom(result.data.data);
+            setCurrentPage(1)
+            setMaxPage(parseInt(Math.ceil(result.data.data.length)/10)+1);
+
         } catch(e) {
             console.log(e)
         }
@@ -162,8 +186,38 @@ const Home = () => {
     }
 
     const handleClickPage = (e) => {
-        setPage(e.target.innerText);
-        getRoom(e.target.innerText);
+        if(isSreach === false) {
+            setPage(e.target.innerText);
+            getRoom(e.target.innerText);
+            // window.scrollTo(0, 0);
+        }
+        else {
+            setCurrentPage(Number(e.target.innerText));
+            console.log(Number(e.target.innerText))
+        }
+    }
+
+    const renderRoom = () =>{
+        if(isSreach === false) {
+            return room;
+        }
+        if(room.length == 0) {
+            return room;
+        }
+        const arr = []
+        if(currentPage < maxPage) {
+            for(let i = (currentPage-1)*10; i < currentPage*10; i++) {
+                arr.push(room[i])
+            }
+        }
+        else {
+            console.log(room);
+            for(let i = (currentPage-1)*10; i < room.length; i++) {
+                arr.push(room[i])
+            }
+            
+        }
+        return arr;
     }
 
     // Layout
@@ -248,13 +302,13 @@ const Home = () => {
                             <div className='RoomTitle'>
                                 <h2>Danh Sách Tin Đăng</h2>
                             </div>
-                            {room !== null ? room.map((item, index) => <RoomList key={index} room={item[0]} />) : <div></div>}
-                        <Pagination onClick={handleClickPage}  style={{marginTop: '10px', textAlign: 'center'}} count={maxPage} color="primary" />
+                            {room.length !== 0 ? renderRoom().map((item, index) => <RoomList key={index} room={item[0]} />) : <div></div>}
+                        <Pagination onClick={handleClickPage}  style={{marginTop: '10px', textAlign: 'center'}} page={currentPage} count={maxPage} color="primary" />
                         </div>
                     </Col>
                     <Col className='search-info-detail' lg={3}>
                         <Row>
-                            <SortByPrice setRoomHome={(doc) => setRoom(doc)}/>
+                            <SortByPrice setRoomHome={(doc) => setRoom(doc)} setIsSearch={setIsSearch} setMaxPage={setMaxPage} setCurrentPage={setCurrentPage}/>
                         </Row>
                         <Row style={{ marginBottom: "20px" }}>
 
