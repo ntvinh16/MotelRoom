@@ -30,7 +30,7 @@ const RoomList = (props) => {
                     <div className='cart-info'>
                         <h2 className='text text-title' style={{ fontSize: '1rem', color: '#E13427', overflow: 'hidden' }}>{room.nameRoom}</h2>
                         <div className='cart-info-detail' style={{ display: 'flex', margin: '10px 0', fontWeight: '600' }}>
-                            <span style={{ color: 'black', marginRight: '40px' }}>{room.address}</span>
+                            <span className='text' style={{ color: 'black', marginRight: '40px' }}>{room.address}</span>
                             <div className='cart-info-detail-price'>
                                 <span style={{ display: 'flex', marginRight: '40px', color: '#16c784' }}>{room.price} đồng/th</span>
                             </div>

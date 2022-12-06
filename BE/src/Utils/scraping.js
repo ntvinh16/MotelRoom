@@ -33,7 +33,7 @@ async function getRoomDetail() {
                 roomDetail_data.push([title, address, phone, price, area, nameContact, description, list_image]);
             });
         }
-        console.log(roomDetail_data)
+        // console.log(roomDetail_data)
         return roomDetail_data
     }
     catch (err) {

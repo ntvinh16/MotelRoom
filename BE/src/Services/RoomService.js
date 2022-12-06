@@ -23,6 +23,7 @@ const geocoder = NodeGeocoder(options);
 
 exports.add = async (data) => {
     try {
+        console.log(data)
         const unit = "triệu/tháng"
         data.map(async (item) => {
             var res = await geocoder.geocode(item[1]);
@@ -32,7 +33,7 @@ exports.add = async (data) => {
                     latitude: res[0].latitude,
                     longitude: res[0].longitude
                 })
-                await location.save();
+                // await location.save();
 
                 let nameCitys = item[1].split(',')[3].trim()
                 const checkCity = await CityModel.find({ nameCity: nameCitys })
@@ -42,7 +43,7 @@ exports.add = async (data) => {
                         idCity: checkCity[0]._id,
                         idCoordinaste: location._id
                     })
-                    await address_detail.save()
+                    // await address_detail.save()
 
                     let price = ""
                     if (item[3].split(" ")[1].trim() == unit) {
@@ -61,14 +62,14 @@ exports.add = async (data) => {
                         area: area,
                         description: item[5],
                     });
-                    await room.save();
+                    // await room.save();
 
                     for (let i = 0; i < item[6].length; i++) {
                         let image = new ImageModel({
                             nameImage: item[6][i],
                             idRoom: room._id
                         });
-                        image.save();
+                        // image.save();
                     }
                 }
             }
@@ -383,10 +384,10 @@ exports.getRoomByPage = async (pageNumber) => {
 
 exports.getRoomBySearch = async (idCity, nameDist, nameWard) => {
     try {
-        
+
         var listRoomDetail = [];
         if (idCity === '') {
-          
+
 
             let listAddressRoom = await Address_DetailModel.find();
             for (var room of listAddressRoom) {
