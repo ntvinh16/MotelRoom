@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import GoogleMapReact from 'google-map-react';
 
 
-
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
 export default function SimpleMap(props) {
+
   const [locationDefault, setLocationDefault] = useState({
     center: {
       lat: props.location.latitude,

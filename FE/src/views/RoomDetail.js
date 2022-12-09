@@ -40,6 +40,7 @@ function RoomDetail() {
         try {
             const result = await roomService.getRoomById(idParam);
             setRoom(result.data.data[0]);
+            console.log(room)
         } catch (error) {
             console.log(error);
         }
@@ -119,7 +120,7 @@ function RoomDetail() {
                                                         <tbody style={{ width: '100%' }}>
                                                             <tr style={{ width: '100%' }}>
                                                                 <td style={{ padding: '16px' }}>Liên hệ</td>
-                                                                <td style={{ padding: '16px' }}>Trung Kiên</td>
+                                                                <td style={{ padding: '16px' }}>{room.nameContact}</td>
                                                             </tr>
                                                             <tr style={{ width: '100%' }}>
                                                                 <td style={{ padding: '16px' }}>Điện thoại</td>

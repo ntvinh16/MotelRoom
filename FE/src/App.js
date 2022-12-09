@@ -16,7 +16,7 @@ function App() {
        <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/roomdetail/:id" element={<RoomDetail />} />
-        <Route path="/map" element={<Map />} />
+        <Route path="/map/:latitude/:longitude" element={<Map />} />
       </Routes>
       <Footer />
     </div>

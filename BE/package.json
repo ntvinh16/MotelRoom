@@ -23,6 +23,7 @@
     "node-fetch": "^3.2.10",
     "node-geocoder": "^4.2.0",
     "nodemon": "^2.0.19",
-    "opencage-api-client": "^1.0.0"
+    "opencage-api-client": "^1.0.0",
+    "xhr2": "^0.2.1"
   }
 }

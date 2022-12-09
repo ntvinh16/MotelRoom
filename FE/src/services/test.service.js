@@ -48,8 +48,8 @@ class RoomService extends BaseService {
         return result;
     }
 
-    getAllRoomByIdCities = async (idCity) => {
-        const result = await this.api.get(`/room/getAllRoomByIdCities?idCity=${idCity}`);
+    getAllRoomByIdCities = async (idCity, page) => {
+        const result = await this.api.get(`/room/getAllRoomByIdCities?idCity=${idCity}&page=${page}`);
         return result;
     }
 
@@ -80,6 +80,13 @@ class RoomService extends BaseService {
 
     getPageHome = async () => {
         const result = await this.api.get(`/room/getPageHome`);
+        return result;
+    }
+
+
+    getRoomByLocation = async (latitude, longitude) => {
+        const result = await this.api.post(`/room/getRoomByLocation`, {latitude, longitude});
+        console.log(result)
         return result;
     }
     

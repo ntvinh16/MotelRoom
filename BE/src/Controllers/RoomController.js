@@ -1,4 +1,4 @@
-const { add, scraping, getAllRoom, getPageHome, getAllRoomByIdCities, getAllRoomByIdDists, getAllRoomByIdWard, getLocationByIdRoom, getRoomPageOne, getRoomById, getRoomByPrice, getRoomByArea , getRoomByAreaAndPrice, getRoomBySearch, getRoomByPage} = require("../Services/RoomService");
+const { add, scraping, getAllRoom, getPageHome, getRoomByLocation, getAllRoomByIdCities, getAllRoomByIdDists, getAllRoomByIdWard, getLocationByIdRoom, getRoomPageOne, getRoomById, getRoomByPrice, getRoomByArea , getRoomByAreaAndPrice, getRoomBySearch, getRoomByPage} = require("../Services/RoomService");
 const getRoomDetail = require('../Utils/scraping')
 
 module.exports = {
@@ -43,7 +43,8 @@ module.exports = {
   getAllRoomByIdCities: async (req, res) => {
     try {
       const idCity = req.query.idCity;
-      const result = await getAllRoomByIdCities(idCity);
+      const page = req.query.page;
+      const result = await getAllRoomByIdCities(idCity, page);
       return res.status(200).json(result);
     } catch (err) {
       console.log(err)
@@ -144,8 +145,8 @@ module.exports = {
       const idCity = req.body.idCity;
       const nameDist = req.body.nameDist;
       const nameWard = req.body.nameWard;
-      const page = req.query.page;
-      const result = await getRoomBySearch(idCity, nameDist, nameWard, page);
+      // const page = req.query.page;
+      const result = await getRoomBySearch(idCity, nameDist, nameWard);
       return res.status(200).json(result);
     } catch (err) {
       return res.status(500).json({
@@ -192,6 +193,32 @@ module.exports = {
   getPageHome: async (req, res) => {
     try {
       const result = await getPageHome();
+      return res.status(200).json(result);
+    } catch (err) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        err,
+      });
+    }
+  },
+  getPageCity: async (req, res) => {
+    try {
+      const idCity = req.query.idCity;
+      const result = await getPageCity(idCity);
+      return res.status(200).json(result);
+    } catch (err) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        err,
+      });
+    }
+  },
+  getRoomByLocation: async (req, res) => {
+    try {
+      const latitude = parseFloat(req.body.latitude);
+      const longitude = parseFloat(req.body.longitude);
+      // console.log(latitude)
+      const result = await getRoomByLocation(latitude, longitude);
       return res.status(200).json(result);
     } catch (err) {
       return res.status(500).json({

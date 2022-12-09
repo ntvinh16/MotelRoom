@@ -5,7 +5,7 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Slider } from 'primereact/slider';
 import Pagination from '@mui/material/Pagination';
-
+import { useNavigate } from 'react-router-dom';
 
 
 // import Button from 'react-bootstrap/Button';
@@ -28,18 +28,22 @@ import Image_HN from 'assets/images/location_hn.jpg';
 
 
 
+
 const roomService = new RoomService();
 const Home = () => {
+    const navigate = useNavigate()
     const [selectedCity, setSelectedCity] = useState('');
     const [selectedDists, setSelectedDists] = useState('');
     const [selectedWards, setSelectedWards] = useState('');
     const [isSreach, setIsSearch] = useState(false);
 
+    const [currentPosition, setCurrenPosition] = useState(null);
     const [cities, setCities] = useState(null);
     const [dists, setDists] = useState(null);
     const [wards, setWards] = useState(null);
     const [price, setPrice] = useState([0, 50]);
     const [area, setArea] = useState([0, 100]);
+    const [idCity, setIdCity] = useState(null);
 
     const [currentPage, setCurrentPage] = useState(1)
 
@@ -81,6 +85,7 @@ const Home = () => {
         try {
             const result = await roomService.getAllRoom(page);
             // setMaxPage(result.data.data.maxPage)
+            console.log(result.data)
             setRoom(result.data.data);
         } catch (error) {
             console.log(error);
@@ -109,14 +114,10 @@ const Home = () => {
         }
     }
 
-
-
-
-
     useEffect(() => {
         getCity();
         getRoom(page);
-        getPageHome()
+        getPageHome();
     }, []);
 
 
@@ -129,6 +130,7 @@ const Home = () => {
     const onSearch = async (e) => {
         try {
             setIsSearch(true);
+            setIdCity(null)
             let idCity = selectedCity
             let dist = ''
             let ward = ''
@@ -155,14 +157,44 @@ const Home = () => {
 
     }
 
+    const onSearchByGeolocation = async(e) => {
+        try{
+            navigator.geolocation.getCurrentPosition((position) => {
+                // console.log(position.coords.latitude, position.coords.longitude);
+                navigate(`/map/${position.coords.latitude}/${position.coords.longitude}`)
+            })
+        }catch(e) {
+            console.log(e)
+        }
+    }
+
     const onClickCity = async (e) => {
         try {
-            setIsSearch(true);
-            const result = await roomService.getAllRoomByIdCities(e); 
-            console.log(result.data.data);
+            setRoom([])
+            setIsSearch(false);
+            setIdCity(e)
+            console.log(e)
+            const result = await roomService.getAllRoomByIdCities(e, 1); 
+            console.log(result.data)
             setRoom(result.data.data);
             setCurrentPage(1)
-            setMaxPage(parseInt(Math.ceil(result.data.data.length)/10)+1);
+            setMaxPage(result.data.data2);
+
+        } catch(e) {
+            console.log(e)
+        }
+    }
+    const onChangePageCity = async ( currentPage) => {
+        try {
+            setIsSearch(false);
+            const result = await roomService.getAllRoomByIdCities(idCity, currentPage); 
+            console.log(result.data)
+            // console.log(result.data.data);
+            setRoom(result.data.data);
+            // setCurrentPage(1)
+            // setCurrentPage(Number(e.target.innerText));
+
+            setMaxPage(result.data.data2);
 
         } catch(e) {
             console.log(e)
@@ -186,10 +218,14 @@ const Home = () => {
     }
 
     const handleClickPage = (e) => {
-        if(isSreach === false) {
+        if(isSreach === false && idCity===null) {
             setPage(e.target.innerText);
             getRoom(e.target.innerText);
             // window.scrollTo(0, 0);
+            setCurrentPage(Number(e.target.innerText));
+        }else if(idCity!=null && isSreach === false) {
+            onChangePageCity(Number(e.target.innerText))
+            setCurrentPage(Number(e.target.innerText));
         }
         else {
             setCurrentPage(Number(e.target.innerText));
@@ -243,7 +279,7 @@ const Home = () => {
                             <Dropdown className='slect-area' style={{ color: '#333', marginRight: "5px", minWidth: '260px' }} value={selectedDists} options={dists} onChange={onDistChange} optionLabel="nameDist" optionValue='_id' placeholder="Quận, huyện" />
                             <Dropdown className='slect-area' style={{ color: '#333', marginRight: "5px", minWidth: '260px' }} value={selectedWards} options={wards} onChange={onWardChange} optionLabel="nameWard" optionValue='_id' placeholder="Phường, xã" />
                             <Button style={{ minWidth: '260px'}} label="Tìm kiếm" icon="pi pi-search" iconPos="right" onClick={onSearch} />
-                            <Button style={{ minWidth: '260px', marginTop: '6px', backgroundColor: "#fbc02dc", border: "none" }} label="Tìm kiếm quanh đây" icon="pi pi-search" iconPos="right" onClick={onSearch} />
+                            <Button style={{ minWidth: '260px', marginTop: '6px', backgroundColor: "#fbc02dc", border: "none" }} label="Tìm xung quanh" icon="pi pi-search" iconPos="right" onClick={onSearchByGeolocation} />
                         </div>
                     </Col>
                 </Row>

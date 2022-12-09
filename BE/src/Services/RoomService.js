@@ -4,11 +4,13 @@ const getRoomDetail = require('../Utils/scraping')
 const RoomModel = require("../Models/Room");
 const ImageModel = require("../Models/Image");
 const Address_DetailModel = require("../Models/Address_Detail");
-const CityModel = require('../Models/City');
+const CityModel = require("../Models/City");
 const CoordinatesModel = require("../Models/Coordinates");
 
 
 const NodeGeocoder = require('node-geocoder');
+const { city } = require("./CityService");
+
 
 const options = {
     provider: 'google',
@@ -21,9 +23,9 @@ const options = {
 const geocoder = NodeGeocoder(options);
 
 
+
 exports.add = async (data) => {
     try {
-        console.log(data)
         const unit = "triệu/tháng"
         data.map(async (item) => {
             var res = await geocoder.geocode(item[1]);
@@ -33,43 +35,44 @@ exports.add = async (data) => {
                     latitude: res[0].latitude,
                     longitude: res[0].longitude
                 })
-                // await location.save();
+                await location.save();
 
-                let nameCitys = item[1].split(',')[3].trim()
-                const checkCity = await CityModel.find({ nameCity: nameCitys })
-                if (typeof checkCity[0] != "undefined") {
-                    let address_detail = new Address_DetailModel({
-                        nameAddress: item[1].trim(),
-                        idCity: checkCity[0]._id,
-                        idCoordinaste: location._id
-                    })
-                    // await address_detail.save()
+                if (typeof (item[1].split(',')[3]) != "undefined") {
+                    let nameCitys = item[1].split(',')[3].trim()
+                    const checkCity = await CityModel.find({ nameCity: nameCitys })
+                    if (typeof checkCity[0] != "undefined") {
+                        let address_detail = new Address_DetailModel({
+                            nameAddress: item[1].trim(),
+                            idCity: checkCity[0]._id,
+                            idCoordinaste: location._id
+                        })
+                        await address_detail.save()
+                        let price = ""
+                        if (item[3].split(" ")[1].trim() == unit) {
+                            price = parseFloat(item[3].split(" ")[0]) * 1000000
+                        } else {
+                            price = parseFloat(item[3].split(" ")[0]) * 1000
+                        }
+                        let area = parseFloat(item[4].split("m")[0])
 
-                    let price = ""
-                    if (item[3].split(" ")[1].trim() == unit) {
-                        price = parseFloat(item[3].split(" ")[0]) * 1000000
-                    } else {
-                        price = parseFloat(item[3].split(" ")[0]) * 1000
-                    }
-                    let area = parseFloat(item[4].split("m")[0])
-
-                    let room = new RoomModel({
-                        nameRoom: item[0],
-                        address: address_detail._id,
-                        phone: item[2].trim(),
-                        // nameContact: item[1].trim(), Luu y kiem tra item thu may?????????
-                        price: price,
-                        area: area,
-                        description: item[5],
-                    });
-                    // await room.save();
-
-                    for (let i = 0; i < item[6].length; i++) {
-                        let image = new ImageModel({
-                            nameImage: item[6][i],
-                            idRoom: room._id
+                        let room = new RoomModel({
+                            nameRoom: item[0],
+                            address: address_detail._id,
+                            phone: item[2].trim(),
+                            nameContact: item[5].trim(),
+                            price: price,
+                            area: area,
+                            description: item[6],
                         });
-                        // image.save();
+                        await room.save();
+
+                        for (let i = 0; i < item[7].length; i++) {
+                            let image = new ImageModel({
+                                nameImage: item[7][i],
+                                idRoom: room._id
+                            });
+                            image.save();
+                        }
                     }
                 }
             }
@@ -111,14 +114,10 @@ exports.getAllRoom = async (page) => {
             }
             return SuccessHander(200, "Create category success", listRoomDetail);
 
-            // console.log(skip)
         } else {
-
             let listRoom = await Address_DetailModel.find()
-            // console.log(listRoom)
             var listRoomDetail = [];
             for (var room of listRoom) {
-                // console.log(room)
                 const response = await RoomModel.find({ address: room._id });
                 const result = response.map((item) => {
                     return {
@@ -135,7 +134,6 @@ exports.getAllRoom = async (page) => {
             }
             return SuccessHander(200, "Create category success", listRoomDetail);
         }
-
     }
     catch (err) {
         console.log(err)
@@ -143,10 +141,15 @@ exports.getAllRoom = async (page) => {
     }
 }
 
-exports.getAllRoomByIdCities = async (idCity) => {
+exports.getAllRoomByIdCities = async (idCity, page) => {
     try {
-
-        let listRoom = await Address_DetailModel.find({ idCity })
+        console.log(idCity, page)
+        const PAGE_SIZE = 10;
+        page = parseInt(page);
+        var skip = (page - 1) * PAGE_SIZE;
+        let pageNumber = await Address_DetailModel.find({idCity}).count();
+        let maxPage = Math.ceil(pageNumber / 10)
+        let listRoom = await Address_DetailModel.find({ idCity }).skip(skip).limit(PAGE_SIZE);
         // console.log(listRoom)
         var listRoomDetail = [];
         for (var room of listRoom) {
@@ -165,7 +168,8 @@ exports.getAllRoomByIdCities = async (idCity) => {
             })
             listRoomDetail.push(result);
         }
-        return SuccessHander(200, "Create category success", listRoomDetail);
+        // listRoomDetail.push(maxPage)
+        return SuccessHander(200, "Create category success", listRoomDetail, maxPage);
     }
     catch (err) {
         console.log(err)
@@ -255,7 +259,7 @@ exports.getRoomById = async (idRoom) => {
                 "price": item.price,
                 "area": item.area,
                 "phone": item.phone,
-                // "nameContact": item.nameContact,
+                "nameContact": item.nameContact,
                 "description": item.description
             }
         })
@@ -388,7 +392,6 @@ exports.getRoomBySearch = async (idCity, nameDist, nameWard) => {
         var listRoomDetail = [];
         if (idCity === '') {
 
-
             let listAddressRoom = await Address_DetailModel.find();
             for (var room of listAddressRoom) {
                 const response = await RoomModel.find({ address: room._id });
@@ -407,7 +410,6 @@ exports.getRoomBySearch = async (idCity, nameDist, nameWard) => {
             }
             return SuccessHander(200, "Create category success", listRoomDetail);
         } else if (idCity != '' && nameDist === '' && nameWard === '') {
-
             let listAddressRoom = await Address_DetailModel.find({ idCity: idCity });
             for (var room of listAddressRoom) {
                 const response = await RoomModel.find({ address: room._id });
@@ -539,6 +541,54 @@ exports.getPageHome = async () => {
         const maxPage = Math.ceil(pageNumber / 10)
 
         return SuccessHander(200, "Create category success", maxPage);
+    }
+    catch (err) {
+        console.log(err)
+        return ErrorHander(400, "Error", err);
+    }
+}
+
+exports.getPageCity = async (idCity) => {
+    try {
+        let pageNumber = await Address_DetailModel.find({idCity: idCity}).count();
+        const maxPage = Math.ceil(pageNumber / 10)
+
+        return SuccessHander(200, "Create category success", maxPage);
+    }
+    catch (err) {
+        console.log(err)
+        return ErrorHander(400, "Error", err);
+    }
+}
+
+exports.getRoomByLocation = async (latitude, longitude) => {
+    try {
+        var geocoder = NodeGeocoder(options);
+        let city = '';
+        let dist = '';
+        await geocoder.reverse({ lat: latitude, lon: longitude }, async function (err, res) {
+            console.log(res[0])
+            city = res[0].administrativeLevels.level1short.split('Thành phố')[1].trim();
+            dist = res[0].administrativeLevels.level2short
+
+        });
+        let cityLocation = await CityModel.find({ nameCity: city });
+        let listAddressRoom = await Address_DetailModel.find({ "idCity": cityLocation[0]._id });
+        var listAddressRoomDist = [];
+        listAddressRoom.forEach((item) => {
+            if(typeof (item.nameAddress.split(",")[2].split("Quận")[1]) != 'undefined') {
+                let addressDist = item.nameAddress.split(",")[2].split("Quận")[1].trim();
+                if (addressDist == dist)
+                    listAddressRoomDist.push(item.idCoordinaste);
+            }
+        })
+        let listCoordonates = [];
+        for (let i of listAddressRoomDist) {
+            let coordinates = await CoordinatesModel.find({_id: i})
+            listCoordonates.push(coordinates[0]);
+            
+        }
+        return SuccessHander(200, "Create category success", listCoordonates);
     }
     catch (err) {
         console.log(err)
