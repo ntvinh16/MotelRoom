@@ -37,6 +37,7 @@ async function getRoomDetail() {
                 });
             }
         }
+        
         // console.log(roomDetail_data)
         return roomDetail_data
     }
@@ -74,7 +75,7 @@ async function getPage(url) {
         let pages = [];
         pageURL = $("a[class='page-link'][rel='next']").attr('href');
         // pageNumber = pageURL.split('=')[1]
-        for (let i = 1; i < 30; i++) {
+        for (let i = 1; i < 2; i++) {
             next_page = baseUrl + '?page=' + i;
             pages.push(next_page);
         }

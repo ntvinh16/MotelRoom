@@ -86,7 +86,7 @@ class RoomService extends BaseService {
 
     getRoomByLocation = async (latitude, longitude) => {
         const result = await this.api.post(`/room/getRoomByLocation`, {latitude, longitude});
-        console.log(result)
+        // console.log(result)
         return result;
     }
     

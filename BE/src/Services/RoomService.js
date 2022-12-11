@@ -6,7 +6,7 @@ const ImageModel = require("../Models/Image");
 const Address_DetailModel = require("../Models/Address_Detail");
 const CityModel = require("../Models/City");
 const CoordinatesModel = require("../Models/Coordinates");
-
+const writeFile = require("../Utils/backupdata")
 
 const NodeGeocoder = require('node-geocoder');
 const { city } = require("./CityService");
@@ -26,57 +26,60 @@ const geocoder = NodeGeocoder(options);
 
 exports.add = async (data) => {
     try {
-        const unit = "triệu/tháng"
-        data.map(async (item) => {
-            var res = await geocoder.geocode(item[1]);
+        // console.log(data)
+    //    await writeFile()
+        // const unit = "triệu/tháng"
+        // data.map(async (item) => {
+        //     var res = await geocoder.geocode(item[1]);
 
-            if (typeof res[0] != "undefined") {
-                let location = new CoordinatesModel({
-                    latitude: res[0].latitude,
-                    longitude: res[0].longitude
-                })
-                await location.save();
+        //     if (typeof res[0] != "undefined") {
+        //         let location = new CoordinatesModel({
+        //             latitude: res[0].latitude,
+        //             longitude: res[0].longitude
+        //         })
+        //         await location.save();
 
-                if (typeof (item[1].split(',')[3]) != "undefined") {
-                    let nameCitys = item[1].split(',')[3].trim()
-                    const checkCity = await CityModel.find({ nameCity: nameCitys })
-                    if (typeof checkCity[0] != "undefined") {
-                        let address_detail = new Address_DetailModel({
-                            nameAddress: item[1].trim(),
-                            idCity: checkCity[0]._id,
-                            idCoordinaste: location._id
-                        })
-                        await address_detail.save()
-                        let price = ""
-                        if (item[3].split(" ")[1].trim() == unit) {
-                            price = parseFloat(item[3].split(" ")[0]) * 1000000
-                        } else {
-                            price = parseFloat(item[3].split(" ")[0]) * 1000
-                        }
-                        let area = parseFloat(item[4].split("m")[0])
+        //         if (typeof (item[1].split(',')[3]) != "undefined") {
+        //             let nameCitys = item[1].split(',')[3].trim()
+        //             const checkCity = await CityModel.find({ nameCity: nameCitys })
+        //             if (typeof checkCity[0] != "undefined") {
+        //                 let address_detail = new Address_DetailModel({
+        //                     nameAddress: item[1].trim(),
+        //                     idCity: checkCity[0]._id,
+        //                     idCoordinaste: location._id
+        //                 })
+        //                 await address_detail.save()
 
-                        let room = new RoomModel({
-                            nameRoom: item[0],
-                            address: address_detail._id,
-                            phone: item[2].trim(),
-                            nameContact: item[5].trim(),
-                            price: price,
-                            area: area,
-                            description: item[6],
-                        });
-                        await room.save();
+        //                 let price = ""
+        //                 if (item[3].split(" ")[1].trim() == unit) {
+        //                     price = parseFloat(item[3].split(" ")[0]) * 1000000
+        //                 } else {
+        //                     price = parseFloat(item[3].split(" ")[0]) * 1000
+        //                 }
+        //                 let area = parseFloat(item[4].split("m")[0])
 
-                        for (let i = 0; i < item[7].length; i++) {
-                            let image = new ImageModel({
-                                nameImage: item[7][i],
-                                idRoom: room._id
-                            });
-                            image.save();
-                        }
-                    }
-                }
-            }
-        });
+        //                 let room = new RoomModel({
+        //                     nameRoom: item[0],
+        //                     address: address_detail._id,
+        //                     phone: item[2].trim(),
+        //                     nameContact: item[5].trim(),
+        //                     price: price,
+        //                     area: area,
+        //                     description: item[6],
+        //                 });
+        //                 await room.save();
+
+        //                 for (let i = 0; i < item[7].length; i++) {
+        //                     let image = new ImageModel({
+        //                         nameImage: item[7][i],
+        //                         idRoom: room._id
+        //                     });
+        //                     image.save();
+        //                 }
+        //             }
+        //         }
+        //     }
+        // });
         return SuccessHander(200, "Create category success");
     } catch (err) {
         return ErrorHander(400, "Error", err);
@@ -84,13 +87,16 @@ exports.add = async (data) => {
 }
 
 exports.scraping = async () => {
+    await writeFile()
+
     const result = await getRoomDetail();
-    console.log(result)
+    // console.log(result)
     return SuccessHander(200, "Create category success", result);
 }
 
 exports.getAllRoom = async (page) => {
     try {
+
         const PAGE_SIZE = 10;
         if (page) {
             page = parseInt(page);
@@ -537,6 +543,7 @@ exports.getRoomPageOne = async (idRoom) => {
 
 exports.getPageHome = async () => {
     try {
+        
         let pageNumber = await RoomModel.count();
         const maxPage = Math.ceil(pageNumber / 10)
 
@@ -563,15 +570,17 @@ exports.getPageCity = async (idCity) => {
 
 exports.getRoomByLocation = async (latitude, longitude) => {
     try {
+        // console.log(latitude, longitude)
         var geocoder = NodeGeocoder(options);
-        let city = '';
-        let dist = '';
-        await geocoder.reverse({ lat: latitude, lon: longitude }, async function (err, res) {
-            console.log(res[0])
-            city = res[0].administrativeLevels.level1short.split('Thành phố')[1].trim();
-            dist = res[0].administrativeLevels.level2short
+        let city = 'Cần Thơ';
+        let dist = 'Ninh Kiều';
+        // await geocoder.reverse({ lat: latitude, lon: longitude }, async function (err, res) {
+        //     console.log(res[0])
+        //     // city = res[0].administrativeLevels.level1short.split('Thành phố')[1].trim();
+        //     city = res[0].administrativeLevels.level1short;
+        //     dist = res[0].administrativeLevels.level2short
 
-        });
+        // });
         let cityLocation = await CityModel.find({ nameCity: city });
         let listAddressRoom = await Address_DetailModel.find({ "idCity": cityLocation[0]._id });
         var listAddressRoomDist = [];
@@ -579,15 +588,15 @@ exports.getRoomByLocation = async (latitude, longitude) => {
             if(typeof (item.nameAddress.split(",")[2].split("Quận")[1]) != 'undefined') {
                 let addressDist = item.nameAddress.split(",")[2].split("Quận")[1].trim();
                 if (addressDist == dist)
-                    listAddressRoomDist.push(item.idCoordinaste);
+                    listAddressRoomDist.push(item);
             }
         })
         let listCoordonates = [];
         for (let i of listAddressRoomDist) {
-            let coordinates = await CoordinatesModel.find({_id: i})
-            listCoordonates.push(coordinates[0]);
-            
+            let coordinates = await CoordinatesModel.find({_id: i.coordinates})
+            listCoordonates.push(coordinates[0]);  
         }
+        // console.log(listAddressRoom)
         return SuccessHander(200, "Create category success", listCoordonates);
     }
     catch (err) {

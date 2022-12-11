@@ -20,9 +20,9 @@ export default function SimpleMap() {
 
   const getRoomByLocation = async () => {
     try{
+      // console.log(latitude, longitude)
       const result = await roomService.getRoomByLocation(parseFloat(latitude), parseFloat(longitude));
-      console.log(result.data)
-      setPoints(result.data.data)
+      setPoints(result.data)
     }catch(err) {
       console.log(err)
     }
@@ -30,6 +30,8 @@ export default function SimpleMap() {
 
 useEffect(()=> {
   getRoomByLocation();
+      console.log(points.length !== 0)
+
 }, [])
 
   if (parseFloat(latitude) === 0) {
@@ -57,7 +59,7 @@ useEffect(()=> {
           />
           {
             points.length !== 0 ? points.map((item, index) => {
-              return <AnyReactComponent
+              return <AnyReactComponent key={index}
               lat={item.latitude}
               lng={item.longitude}
   
